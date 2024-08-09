@@ -1,0 +1,167 @@
+
+This is an MERN stack project which acts as an web app just like real-time video conferencing application.
+
+What more we have used : 
+	- NextJS : React library w/ built-in optimizations, dynamic html streaming and much more functionalities.
+	- Tailwind CSS : Utility first css framework, for easy styling.
+	- shadsc/ui : Used as component library of choice. Its an open source provider that provides some pre-built component that we can manipulate in our own way.
+	
+
+##### Doing some setup for project
+
+- Created folder (VideoConferencingProject) for app and opened in vs code
+
+- Install Next.js
+1. Goto to : https://ui.shadcn.com/docs/installation/next
+2. In VS terminal, paste the commands
+	i. Create next project (enter everything) : npx create-next-app@latest video-conferencing-slp --typescript --tailwind --eslint		(./ for into the directory itself) but we need seprate name w/ slp -> self learning project
+	ii. move to app folder : cd video-conferencing-slp
+	iii. for shadcn-ui run cli (enter everything) : npx shadcn-ui@latest init
+	iv. So shadcn-ui provides some prebuilt components that we can edit later, for ex. for button : npx shadcn-ui@latest add button	(will add button.tsx in components folder)
+	v. Imported button into page.tsx (main file)
+3. Run the application using : npm run dev
+
+
+- Through project if u see like ***topic, it can be seen in other note ie. nextJS-learning.txt.
+
+
+
+
+##### started building the application
+
+
+++ Added (auth) and (root) 		ie. folders w/ route parathesis.
+	***NextJS -> Route Groups
+
+
+++ Added (auth)/sign-in and sign-up | (root)/layout.tsx | (root)/home/layout.tsx
+
+++ Added (root)/meeting/[id]/layout.tsx		ie. folder w/ square paranthesis
+	***NextJS -> Dynamic routes
+
+++ Added custom css style colors in tailwind.config.ts as     
+	extend: {
+      colors: {
+        dark:{
+          1: '#1C1F2E',
+          2: '#161925'
+        },
+        blue:{
+          1: '#0E78F9'
+        },
+
+++ Added (root)/home, personal-room, upcoming, recordings, previous with layout.tsx and page.tsx files in the folders.
+	***NextJS -> layout.txt, page.tsx
+
+++ Added constants/index.ts		: it stores array of items to be used in sidebar
+
+++ Added components/Sidebar 	: sidebar for app, hide for sm, import above array, uses 'use client' next js directive
+	***NextJS -> 'use client' directive
+
+++ Added components/Navbar		: navbar for app, where the hamburger is hidden for large screen
+
+++ Added components/MobileNav	: navbar w/ hamburger visible when screen size is small
+
+++ For MobileNav's side toggle bar : Sheet from shadcn/ui is used. Installed using : npx shadcn-ui@latest add sheet
+
+++ Added multiple css when a class is used on element in app/global.css as 
+	@layer utilities{
+	  .flex-center {
+		@apply flex justify-center items-center;
+	  }
+
+	  .flex-between{
+		@apply flex justify-between items-center;
+	  }
+	}
+
+++ Install clerk through terminal as : npm install @clerk/nextjs
+
+++ Signed in to clerk.com and created "jsm_zoom_clone" project to get own pulishable key and secret key.
+
+++ Added .env.local in root dir 	 : copy-paste both keys for/from clerk auth.
+
+++ Added middleware.ts in root dir   : copy-paste middleware code for clerk auth.
+
+++ Added <SignedIn> into navbar.tsx ie. clerk component
+
+++ Updated middleware.ts
+
+++ Updated app.layout.tsx w/ <ClerkProvider> wrap in w/ custom apperence -> layout and variables style
+
+++ global.css is updated w/ overwritten css for clerk sign-in/up template
+
+++ Added components/ui/MeetingTypeList 		-> this to add the four req cards and modal on home page
+
+++ Added components/ui/HomeCard 	-> this takes in some info and creates a card
+
+++ Added components/ui/MeetingModal		-> this is an modal used when new meet card or any modal req card is clicked
+
+++ For modal : dialog.tsx and for button : button.tsx  are added from shadcn components
+
+
+++ Now we will install STREAM to use its video/audio functionalities for our app
+	- npm install @stream-io/video-react-sdk
+	
+++ Signed-in to Stream and created an application. Got api-key and secret-key from their.
+
+++ Updated .env.local w/ streams api-key and secret-key
+
+++ Added new folder to root dir as Providers and within new file as StreamClientProvider, just like a component.
+
+++ Added new folder to root dir as actions and within new file as stream.actions.ts w/ 'use server' directive.
+
+++ To configure const client in file, need to install api node sdk using : npm i @stream-io/node-sdk
+
+++ Writing tokenProvider() function in stream.actions.ts to be imported and use while updating client in StreamClientProvider.tsx component
+
+++ In StreamClientProvider.tsx, using useEffect hook, to update the client for stream for any change in clerk's user and if-any-user-loaded flag.
+
+++ Wrapping the {children} from (root)/layout.tsx w/ <StreamVideoProvider> to start video streaming.
+
+++ Now installed Toast form shadcn/ui as	: npx shadcn-ui@latest add toast
+
+++ For usage, after import, added <Toaster /> below {children} in app/layout.tsx
+
+++ By Ctrl+LeftClick'ing <Toaster /> or goto components/ui/toaster.tsx styled toaster a bit.
+
+++ Scripting (root)/meeting/[id]/page.tsx using <StreamCall> and <StreamTheme> from stream-io and conditional component rendering.
+
+++ We need custom hook, for this file, hence created one at root dir -> hooks/useGetCallById.ts : this hook query the call for an id or set of id's.
+
+++ Now we need to write code for meeting setup in components/MeetingSetup.tsx.
+
+++ In MeetingSetup component, we have added <VideoPreview> and checkbox insider <DeviceSettings> to on/off mic and cam.
+
+++ Now Implementing components/MeetingRoom for page and logic after joining meeting.
+
+++ In MeetingRoom, we have added <CallLayout> and <CallControls> for meet control.
+	- This was not working, bcz forgot to import css from stream-io/... in app/layout.tsx tobe used as style using <StreamTheme> in meeting/[id]/page.tsx.
+	
+++ Imported dropdown-menu as : npx shadcn-ui@latest add dropdown-menu || tobe used in MeetingRoom.tsx for changing participant layout.
+
+++ Into layout files, we have added the logo and title for html page using Metadata.
+
+++ Updating components/MeetingTypeList.tsx with showing modals for Scheduled meets.
+
+++ For 1st modal we need <Textarea /> that we install from shadcn-ui as : npx shadcn-ui@latest add textarea
+++ also we needed datepicker that we installed of react itself as : npm i react-datepicker
+++ For datepicker style import its css at app/layout as : import 'react-datepicker/dist/react-datepicker.css';
+
+++ Creating components/CallList.tsx for showing sheduled calls.
+
+++ Creating hooks/useGetCall.ts ie. custom-hook to get upcoming/scheduled and endedCalls from StreamvideoClient.
+
+++ Creating components/MeetingCard.tsx for dynamic Card for Upcoming, Previous or Recordings component.
+
+++ Creating hooks/useGetUpcomingCalls.ts ie. getting latest upcoming call to show its time on /home page in card.
+
+++ Adding <CallList /> at /upcomings and /recordings and /previous route pages.
+
+++ Scripting the /personal-room 's page.tsx
+
+++ Importing shadcn-ui 's Input component as : npx shadcn-ui@latest add input || to use in MeetingTypeList.tsx -> isJoiningMeet modal input
+
+
+
+
